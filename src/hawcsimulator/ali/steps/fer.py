@@ -2,13 +2,12 @@ from __future__ import annotations
 
 import numpy as np
 import sasktran2 as sk
-from hamilton.function_modifiers import extract_fields
+from hamilton.function_modifiers import config, extract_fields
 from skretrieval.core.sasktranformat import SASKTRANRadiance
 
 from hawcsimulator.datastructures.atmosphere import Atmosphere
 from hawcsimulator.datastructures.viewinggeo import ObservationContainer
 from hawcsimulator.fer import FERGeneratorBasic
-from hamilton.function_modifiers import config
 
 
 @extract_fields(
@@ -62,6 +61,9 @@ def sk2_atm_and_front_end_radiance_gen(
         "sk2_atmosphere": sk2_atmosphere,
     }
 
+
 @config.when(FER_provided=False)
-def front_end_radiance(fer_gen: FERGeneratorBasic, sk2_atmosphere: sk.Atmosphere)->SASKTRANRadiance:
+def front_end_radiance(
+    fer_gen: FERGeneratorBasic, sk2_atmosphere: sk.Atmosphere
+) -> SASKTRANRadiance:
     return fer_gen.run(sk2_atmosphere)

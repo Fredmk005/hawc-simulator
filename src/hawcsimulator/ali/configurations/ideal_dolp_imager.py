@@ -29,7 +29,7 @@ class IdealALISimulator(Simulator):
 
         data["calibration_database"].close()
 
-        data["viewing_tangent_altitudes"] = np.arange(10000, 40001, 500.0)
+        data["viewing_tangent_altitudes"] = np.arange(-500.0, 50001, 500.0)
         data["observer_altitude"] = 450000.0
 
         data["aerosol_optical_property"] = aerosol_median_radius_db()

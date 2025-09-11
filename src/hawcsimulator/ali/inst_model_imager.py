@@ -44,7 +44,7 @@ class L1bGeneratorIdealImager(L1bGenerator):
                 I + np.cos(np.deg2rad(2 * a)) * Q + np.sin(np.deg2rad(2 * a)) * U
             ) / 2.0
 
-            m, sigma = self._noise_model.calc_noise(m)
+            m, sigma = self._noise_model.calc_noise(m, fer=fer.data)
 
             sigma = sigma**2
 
