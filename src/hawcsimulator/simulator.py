@@ -22,6 +22,7 @@ class Simulator:
         self,
         outputs: list[str],
         input: None | dict = None,
+        overrides: None | dict = None,
         extra_modules: list | None = None,
         config: dict | None = None,
     ) -> dict:
@@ -33,7 +34,14 @@ class Simulator:
         if config is None:
             config = {}
 
-        default_config = {"atmosphere_method": "default", "observation_method": "limb", "FER_provided": 'front_end_radiance' in input.keys()}
+        if overrides is None:
+            overrides = {}
+
+        default_config = {
+            "atmosphere_method": "default",
+            "observation_method": "limb",
+            "FER_provided": "front_end_radiance" in input,
+        }
 
         default_config.update(config)
 
@@ -55,7 +63,8 @@ class Simulator:
             .with_config(default_config)
             .build()
         )
-        return dr.execute(outputs, inputs=input)
+
+        return dr.execute(outputs, inputs=input, overrides=overrides)
 
 
 if __name__ == "__main__":
