@@ -36,11 +36,6 @@ dev = [
     "jupyter",
 ]
 
-[tool.uv.sources]
-aliprocessing = { path = "../ali-processing", editable = true }
-skretrieval = { path = "../skretrieval", editable = true }
-showlib = { path = "../show-lib", editable = true }
-
 
 [tool.setuptools_scm]
 write_to = "src/hawcsimulator/_version.py"

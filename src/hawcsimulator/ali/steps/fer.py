@@ -21,6 +21,7 @@ def sk2_atm_and_front_end_radiance_gen(
     observation: ObservationContainer,
     atmosphere: Atmosphere,
     altitude_grid: np.ndarray,
+    wavelength_resolution: float | None = None,
     sk2_kwargs: dict | None = None,
 ) -> dict:
     if sk2_kwargs is None:
@@ -37,14 +38,23 @@ def sk2_atm_and_front_end_radiance_gen(
     )
     fer_gen.sk_config.num_streams = 8
     fer_gen.sk_config.input_validation_mode = sk.InputValidationMode.Disabled
+    fer_gen.sk_config.num_threads = 8
 
     for k, v in sk2_kwargs.items():
         setattr(fer_gen.sk_config, k, v)
 
+    if wavelength_resolution is None:
+        model_wavel = observation.observation.sample_wavelengths()["measurement"]
+    else:
+        sample_wavel = observation.observation.sample_wavelengths()["measurement"]
+        model_wavel = np.arange(
+            np.min(sample_wavel) - 10, np.max(sample_wavel) + 10, wavelength_resolution
+        )
+
     sk2_atmosphere = sk.Atmosphere(
         model_geometry=fer_gen.model_geo,
         config=fer_gen.sk_config,
-        wavelengths_nm=observation.observation.sample_wavelengths()["measurement"],
+        wavelengths_nm=model_wavel,
         calculate_derivatives=False,
     )
 
