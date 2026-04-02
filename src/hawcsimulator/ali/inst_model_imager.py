@@ -16,6 +16,7 @@ class L1bGeneratorIdealImager(L1bGenerator):
         noise_model=None,
         pol_states=None,
         include_noise=False,
+        pointing_error_1sigma=0.0,
         **kwargs,
     ):
         self._observation = observation
@@ -28,12 +29,30 @@ class L1bGeneratorIdealImager(L1bGenerator):
         else:
             self._pol_states = pol_states
 
+        self._pointing_error_1sigma = pointing_error_1sigma
+
     def run(self, fer: xr.Dataset):
         result = {}
 
-        I = fer.data["radiance"].isel(stokes=0)  # noqa: E741
-        Q = fer.data["radiance"].isel(stokes=1)
-        U = fer.data["radiance"].isel(stokes=2)
+        if self._pointing_error_1sigma > 0.0:
+            new_fer = fer.data.copy(deep=True).swap_dims({"los": "tangent_altitude"})
+
+            for i in range(len(new_fer.spectral_grid)):
+                t_alt_shift = np.random.default_rng(None).normal(
+                    0, self._pointing_error_1sigma
+                )
+                new_fer["radiance"].values[i, :, :] = new_fer.interp(
+                    tangent_altitude=fer.data.tangent_altitude + t_alt_shift,
+                    kwargs={"fill_value": "extrapolate"},
+                )["radiance"].values[i, :, :]
+            new_fer = new_fer.swap_dims({"tangent_altitude": "los"})
+
+        else:
+            new_fer = fer.data
+
+        I = new_fer["radiance"].isel(stokes=0)  # noqa: E741
+        Q = new_fer["radiance"].isel(stokes=1)
+        U = new_fer["radiance"].isel(stokes=2)
 
         measurements = []
         errors = []
@@ -44,7 +63,7 @@ class L1bGeneratorIdealImager(L1bGenerator):
                 I + np.cos(np.deg2rad(2 * a)) * Q + np.sin(np.deg2rad(2 * a)) * U
             ) / 2.0
 
-            m, sigma = self._noise_model.calc_noise(m, fer=fer.data)
+            m, sigma = self._noise_model.calc_noise(m, fer=new_fer)
 
             sigma = sigma**2
 
@@ -106,9 +125,17 @@ class L1bGeneratorIdealImager(L1bGenerator):
         )
 
         if "dolp" in self._pol_states:
+            systematic_dolp, systematic_std_dolp = self._noise_model.calc_systematic(
+                dolp, name="dolp"
+            )
+
+            std_dolp = np.sqrt(
+                var_dolp.to_numpy() + systematic_std_dolp.to_numpy() ** 2
+            )
+
             result["dolp"] = L1bSpectra.from_np_arrays(
-                dolp.to_numpy(),
-                np.sqrt(var_dolp.to_numpy()),
+                systematic_dolp.to_numpy(),
+                std_dolp,
                 fer.data["tangent_altitude"].to_numpy(),
                 fer.data["tangent_latitude"].to_numpy(),
                 fer.data["tangent_longitude"].to_numpy(),
