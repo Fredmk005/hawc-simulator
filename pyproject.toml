@@ -7,7 +7,20 @@ name = "hawcsimulator"
 dynamic = ["version"]
 description="HAWCsat simulator package"
 readme = "README.md"
-dependencies = ['numpy', 'sasktran2', 'netcdf4', 'appdirs', 'numba>0.55', 'aliprocessing', 'skretrieval', 'showlib', 'sf-hamilton', 'hitran-api']
+dependencies = [
+    'numpy',
+    'sasktran2',
+    'netcdf4',
+    'appdirs',
+    'numba>0.55',
+    'aliprocessing',
+    'skretrieval',
+    'showlib',
+    'sf-hamilton',
+    'hitran-api',
+    "dask>=2025.11.0",
+    "seaborn>=0.13.2",
+]
 authors = [
     { name = "Daniel Zawada", email = "daniel.zawada@usask.ca" },
 ]
@@ -35,6 +48,11 @@ dev = [
     "matplotlib",
     "jupyter",
 ]
+
+[tool.uv.sources]
+aliprocessing = { path = "../ali-processing", editable = true }
+skretrieval = { path = "../skretrieval", editable = true }
+showlib = { path = "../show-lib", editable = true }
 
 
 [tool.setuptools_scm]
