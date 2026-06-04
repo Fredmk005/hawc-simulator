@@ -6,7 +6,7 @@ import appdirs
 import yaml
 from packaging import version
 
-APPDIRS = appdirs.AppDirs(appname="hawcsimulator", appauthor="usask-arg")
+APPDIRS = appdirs.AppDirs(appname="hawc-simulator", appauthor="usask-arg")
 
 
 def user_config_file_location() -> Path:
