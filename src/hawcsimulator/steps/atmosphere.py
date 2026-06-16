@@ -7,6 +7,7 @@ from sasktran2.optical.base import OpticalProperty
 
 import hawcsimulator.atmosphere.earthcare as earthcare
 import hawcsimulator.atmosphere.ompscalera as ompscalera
+import hawcsimulator.atmosphere.merra2scream as merra2scream
 from hawcsimulator.datastructures.atmosphere import Atmosphere
 from hawcsimulator.datastructures.viewinggeo import ObservationContainer
 
@@ -137,3 +138,33 @@ def atmosphere__omps_calipso_era5(
         atmosphere[k] = v
 
     return Atmosphere(atmosphere)
+
+@config.when(atmosphere_method="merra2scream")
+def atmosphere_merra2scream:
+    observation: ObservationContainer,
+    h2o_optical_property: OpticalProperty | None = None,
+    constituents: dict | None = None,
+    ) -> Atmosphere:
+    if constituents is None:
+        constituents = {}
+
+    
+    
+    atmosphere = {
+        "rayleigh": sk.constituent.Rayleigh(),
+        "o3": sk.climatology.mipas.constituent(
+            "O3", sk.optical.O3DBM(), climatology="std"
+        ),
+        "solar_irradiance": sk.constituent.SolarIrradiance(mode="average"),
+        "albedo": sk.constituent.LambertianSurface(0.3),
+    }
+    if h2o_optical_property is not None:
+        atmosphere["h2o"] = sk.constituent.VMRAltitudeAbsorber(
+        h2o_optical_property, alt_grid, vmr
+    )
+
+    for k, v in constituents.items():
+        atmosphere[k] = v
+    return Atmosphere(atmosphere)        
+
+
