@@ -145,7 +145,7 @@ def atmosphere_merra2scream:
     """
     Constructs an atmosphere using Merra 2 Scream data
     """
-    observation: ObservationContainer,
+    (observation: ObservationContainer,
     h2o_optical_property: OpticalProperty | None = None,
     constituents: dict | None = None,
     ) -> Atmosphere:
