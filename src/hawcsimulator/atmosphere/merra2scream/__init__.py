@@ -18,7 +18,7 @@ def _merra2scream_folder():
   raise ValueError(msg)
 
 def _access_MERRA2SCREAMDatasets(earthaccess_folder=None):
-  if earthaccess_folder = None:
+  if earthaccess_folder == None:
     earthaccess_folder = _merra2scream_folder()
   files = sorted(
       f for f in Path(earthaccess_folder).iterdir()
