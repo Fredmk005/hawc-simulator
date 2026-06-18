@@ -6,6 +6,7 @@ from pathlib import Path
 from astropy.coordinates import EarthLocation, get_sun, AltAz
 from astropy.time import Time
 import astropy.units as u
+import pandas as pd
 
 from hawcsimulator.appconfig import load_user_config
 
@@ -48,7 +49,7 @@ def _latlon(ref_lat, ref_lon, ds):
   lon_grid = ds.coords["lon"].values
   lat_grid = ds.coords["lat"].values
 
-  lon = ((lon + 180) % 360) - 180
+  ref_lon = ((ref_lon + 180) % 360) - 180
 
   lon_idx = np.argmin(np.abs(lon_grid - lon))
   lat_idx = np.argmin(np.abs(lat_grid - lat))
