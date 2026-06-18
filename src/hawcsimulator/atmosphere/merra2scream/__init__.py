@@ -30,13 +30,13 @@ def _access_MERRA2SCREAMDatasets(earthaccess_folder=None):
        for f in files
    ]
 
-   times = [
-      pd.to_datetime(
-           f.name.split(".")[-1],
-          format="%Y%m%d_%H%Mz",
-          utc=True,
-      )
-      for f in files
+  times = [
+    pd.to_datetime(
+         f.name.split(".")[-1],
+        format="%Y%m%d_%H%Mz",
+        utc=True,
+    )
+    for f in files
   ]
 
   return {"ds": datasets, "times": times}
