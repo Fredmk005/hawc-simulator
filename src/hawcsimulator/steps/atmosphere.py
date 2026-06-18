@@ -141,17 +141,16 @@ def atmosphere__omps_calipso_era5(
     return Atmosphere(atmosphere)
 
 @config.when(atmosphere_method="merra2scream")
-def atmosphere_merra2scream:
-    """
-    Constructs an atmosphere using Merra 2 Scream data
-    """
-    (observation: ObservationContainer,
+def atmosphere_merra2scream(
+    observation: ObservationContainer,
     h2o_optical_property: OpticalProperty | None = None,
     constituents: dict | None = None,
     ) -> Atmosphere:
     if constituents is None:
         constituents = {}
-
+    """
+    Constructs an atmosphere using Merra 2 Scream data
+    """
     
     ref_lat = observation.observation.referencelatitude()["measurement"]
     ref_lon = observation.observation.referencelatitude()["measurement"]
