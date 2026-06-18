@@ -153,10 +153,10 @@ def atmosphere_merra2scream(
     """
     
     ref_lat = observation.observation.referencelatitude()["measurement"]
-    ref_lon = observation.observation.referencelatitude()["measurement"]
+    ref_lon = observation.observation.referencelongitude()["measurement"]
     datatimedict = merra2scream._access_MERRA2SCREAMDatasets()
     ### Access oldest data set in folder
-    ds = datatimedict["ds"].values()[0]
+    ds = list(datatimedict["ds"])[0]
     lonlat = merra2scream._latlon(ref_lat,ref_lon,ds)
     vmr = merra2scream._species_vmr(lonlat["lon_idx"],lonlat["lat_idx"],ds)["H2O"]
     alt_grid = merra2scream._PTA_grid(lonlat["lon_idx"],lonlat["lat_idx"],ds)["altitude"]
