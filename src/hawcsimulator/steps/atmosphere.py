@@ -170,7 +170,7 @@ def atmosphere_merra2scream(
         "solar_irradiance": sk.constituent.SolarIrradiance(mode="average"),
         "albedo": sk.constituent.LambertianSurface(0.3),
     }
-    if h2o_optical_property is None:
+    if h2o_optical_property is not None:
         atmosphere["h2o"] = sk.constituent.VMRAltitudeAbsorber(
         sk.optical.HITRANAbsorber("H2O"), alt_grid, vmr
     )
