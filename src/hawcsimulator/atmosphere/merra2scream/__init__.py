@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import xarray 
+import xarray as xr
 import numpy as np
 from pathlib import Path
 from astropy.coordinates import EarthLocation, get_sun, AltAz
