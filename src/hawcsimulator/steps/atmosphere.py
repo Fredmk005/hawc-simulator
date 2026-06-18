@@ -12,6 +12,7 @@ from hawcsimulator.datastructures.atmosphere import Atmosphere
 from hawcsimulator.datastructures.viewinggeo import ObservationContainer
 
 
+
 @config.when(atmosphere_method="default")
 def atmosphere__default(constituents: dict | None = None) -> Atmosphere:
     """
@@ -141,6 +142,9 @@ def atmosphere__omps_calipso_era5(
 
 @config.when(atmosphere_method="merra2scream")
 def atmosphere_merra2scream:
+    """
+    Constructs an atmosphere using Merra 2 Scream data
+    """
     observation: ObservationContainer,
     h2o_optical_property: OpticalProperty | None = None,
     constituents: dict | None = None,
@@ -149,7 +153,16 @@ def atmosphere_merra2scream:
         constituents = {}
 
     
+    ref_lat = observation.observation.referencelatitude()["measurement"]
+    ref_lon = observation.observation.referencelatitude()["measurement"]
+    datatimedict = merra2scream._access_MERRA2SCREAMDatasets()
+    ### Access oldest data set in folder
+    ds = datatimedict["ds"].values()[0]
+    lonlat = merra2scream._latlon(ref_lat,ref_lon,ds)
+    vmr = merra2scream._species_vmr(lonlat["lon_idx"],lonlat["lat_idx"],ds)["H2O"]
+    alt_grid = merra2scream._PTA_grid(lonlat["lon_idx"],lonlat["lat_idx"],ds)["altitude"]
     
+    ### could use O3 vmr from merra 2 scream?
     atmosphere = {
         "rayleigh": sk.constituent.Rayleigh(),
         "o3": sk.climatology.mipas.constituent(
@@ -158,9 +171,9 @@ def atmosphere_merra2scream:
         "solar_irradiance": sk.constituent.SolarIrradiance(mode="average"),
         "albedo": sk.constituent.LambertianSurface(0.3),
     }
-    if h2o_optical_property is not None:
+    if h2o_optical_property is None:
         atmosphere["h2o"] = sk.constituent.VMRAltitudeAbsorber(
-        h2o_optical_property, alt_grid, vmr
+        sk.optical.HITRANAbsorber("H2O"), alt_grid, vmr
     )
 
     for k, v in constituents.items():
